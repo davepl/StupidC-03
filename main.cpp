@@ -55,24 +55,46 @@ int main(int argc, char ** argv)
         auto t2 = high_resolution_clock::now();
 
         // floating-point duration: no duration_cast needed
+
         duration<double, std::milli> fp_ms = t2 - t1;
+        
+        // Integer duration will need a duration_cast
+
+        duration<uint32_t, std::micro> iMicrosec = duration_cast<microseconds>(t2 - t1);
+        
+        // Convert to micrososeconds with a duration_cast
+
+        duration<uint32_t, std::micro> cMicrosec = duration_cast<microseconds>(t2 - t1);
 
         // integral duration: requires duration_cast
-        auto int_ms = duration_cast<milliseconds>(t2 - t1);
 
-        // Convert duration to different units
+        milliseconds int_ms = duration_cast<milliseconds>(t2 - t1);
+        
+        // Convert duration to different unit
 
-        auto int_usec  = duration_cast<microseconds>(int_ms).count();
-        auto int_mssec = duration_cast<milliseconds>(int_ms).count();
-        auto int_nsec  = duration_cast<nanoseconds>(int_ms).count();
+        microseconds dur_usec  = duration_cast<microseconds>(int_ms);
+        milliseconds dur_mssec = duration_cast<milliseconds>(int_ms);
+        nanoseconds  dur_nsec  = duration_cast<nanoseconds>(int_ms);
 
+        size_t       count_usec  = dur_usec.count();
+        size_t       count_mssec = dur_mssec.count();
+        size_t       count_nsec  = dur_nsec.count();
+        
         std::cout << "Sleeping for one second took " << fp_ms.count() << " ms, " << endl
-                  << "or " << int_mssec << " milliseconds" << endl
-                  << "or " << int_usec  << " microseconds" << endl 
-                  << "or " << int_nsec  << " nanoseconds" << endl;               
+                  << "or " << count_mssec << " milliseconds" << endl
+                  << "or " << count_usec  << " microseconds" << endl 
+                  << "or " << count_nsec  << " nanoseconds" << endl;               
 
+        //
+        // Clocks
+        //
+
+        auto clockOnTheWall = system_clock::now();
+        auto monotonicNow   = steady_clock::now();
+        auto highResNow     = high_resolution_clock::now();
+        
+        hh_mm_ss = 
         // Integer limits
-
         
         int min_int = INT_MIN;
         int max_int = INT_MAX;

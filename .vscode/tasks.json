@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: cpp build active file",
+            "label": "Compile Source",
             "command": "clang++",
             "args": [
                 "-fdiagnostics-color=always",
@@ -24,7 +24,7 @@
             "detail": "compiler: /usr/bin/g++"
         },
         {
-            "label": "Create Tape File",
+            "label": "Run Program",
             "type": "shell",
             "command": "./main",
             "args": [],
@@ -37,7 +37,7 @@
             },
             "problemMatcher": "$msCompile",
             "dependsOn":[
-                    "Build for KIM-1"
+                    "Compile Source"
             ]
         },
         
