@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: cpp build active file",
+            "command": "clang++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-std=c++2a",
+                "${file}",
+                "-lfmt",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: /usr/bin/g++"
+        },
+        {
+            "label": "Create Tape File",
+            "type": "shell",
+            "command": "./main",
+            "args": [],
+            "group": {
+                    "kind": "test",
+                    "isDefault": true
+            },
+            "presentation": {
+                    "clear": true
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn":[
+                    "Build for KIM-1"
+            ]
+        },
+        
+    ]
+}
