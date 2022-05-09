@@ -1,2 +1,4 @@
 main
 *.dSym
+/x64/Debug
+/.vs/VC-StupidC3/v17
