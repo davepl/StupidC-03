@@ -151,6 +151,11 @@ int main(int argc, char** argv)
 
     cout << "Byte Min: " << min_byte << ", Max: " << max_byte << endl;
 
+    double inf = numeric_limits<double>::infinity();
+    double nan = numeric_limits<double>::quiet_NaN();
+
+    cout << "Infinity: " << inf << ", Nan: " << nan << endl;
+
     // What we can say about type sizes in C:
     //
     // char, signed char, and unsigned char are at least 8 bits
@@ -221,34 +226,27 @@ int main(int argc, char** argv)
 
     // Dyanmic and static precision
 
-    cout << format("{:.{}f}", 3.14159265, 3) << endl;
-    cout << format("{:.3f}", 3.14159265) << endl;
+    cout << format("{:.{}f}", M_PI, 3) << endl;
+    cout << format("{:.3f}",  M_PI) << endl;
 
     // Handling the sign
 
-    // Expect: "+3.140000; -3.140000"
-    cout << format("{:+f}; {:+f}", 3.14, -3.14) << endl;  // show it always
+    // Expect: +3.141593; -3.141593
+    cout << format("{:+f}; {:+f}", M_PI, -M_PI) << endl;  // show it always
 
-    // Expect: " 3.140000; -3.140000"
-    cout << format("{: f}; {: f}", 3.14, -3.14) << endl;  // show a space for positive numbers
+    // Expect: 3.141593; -3.141593
+    cout << format("{: f}; {: f}", M_PI, -M_PI) << endl;  // show a space for positive numbers
 
-    // Expect: "3.140000; -3.140000"
-    cout << format("{:-f}; {:-f}", 3.14, -3.14) << endl;  // show only the minus -- same as '{:f}; {:f}'
+    // Expect: 3.141593; -3.141593
+    cout << format("{:-f}; {:-f}", M_PI, -M_PI) << endl;  // show only the minus -- same as '{:f}; {:f}'
 
     // Converting to different number bases
 
     // Expect: "int: 42;  hex: 2a;  oct: 52; bin: 101010"
-    // with 0x or 0 or 0b as prefix:
-
+  
     cout << format("int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42) << endl;
-
-    // Expect: "int: 42;  hex: 0x2a;  oct: 052;  bin: 0b101010"fmt::format("int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42);
-    // Expect: "int: 42;  hex: 2a;  oct: 52; bin: 101010"
-    // with 0x or 0 or 0b as prefix:
-
-    cout << format("int: {0:d};  hex: {0:#x};  oct: {0:#o};  bin: {0:#b}", 42) << endl;
-
-    // Expect: "int: 42;  hex: 0x2a;  oct: 052;  bin: 0b101010"
+    
+    // Expect: int: 42;  hex: 0x2a;  oct: 052;  bin: 0b101010
 
     cout << format("int: {0:d};  hex: {0:#x};  oct: {0:#o};  bin: {0:#b}", 42) << endl;
 
