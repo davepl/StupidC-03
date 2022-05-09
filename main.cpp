@@ -2,7 +2,6 @@
 
 using namespace std;
 using namespace std::chrono;
-using namespace fmt::v8;
 
 int main(int argc, char ** argv)
 {
@@ -12,7 +11,7 @@ int main(int argc, char ** argv)
 
         clock_t clocks = clock();
         cout << "Program has been running for " << clocks << " clocks." << endl;
-        cout << "Which is equivalent to " <<  (double) clocks / CLOCKS_PER_SEC << " seconds with " 
+        cout << "That is equivalent to " <<  (double) clocks / CLOCKS_PER_SEC << " seconds with " 
              <<  CLOCKS_PER_SEC << " clocks per second." << endl;
 
         // Current date and time
@@ -154,13 +153,30 @@ int main(int argc, char ** argv)
         // What we can say about type sizes in C:
         //
         // char, signed char, and unsigned char are at least 8 bits
+        
+        static_assert(sizeof(char) >= 1);
+        static_assert(sizeof(char) == sizeof(signed char) and sizeof(signed char) == sizeof(unsigned char));
+        
         // signed short, unsigned short, signed int, and unsigned int are at least 16 bits
+                
+        static_assert(sizeof(short) >= 2);
+        static_assert(sizeof(short) == sizeof(signed short) and sizeof(signed short) == sizeof(unsigned short));
+                
         // signed long and unsigned long are at least 32 bits
+        
+        static_assert(sizeof(long) >= 4);
+        static_assert(sizeof(long) == sizeof(signed long) and sizeof(signed long) == sizeof(unsigned long));
+        
         // signed long long and unsigned long long are at least 64 bits        
-        // Sometimes we don't know the actual size, because of the "at least" stuff
-        // intmax_t is the largest type that your compiler and lib can deal with
 
+        static_assert(sizeof(long long) >= 8);
+        static_assert(sizeof(long long) == sizeof(signed long long) and sizeof(signed long long) == sizeof(unsigned long long));
+
+        // Sometimes we don't know the actual size, because of the "at least" stuff
+        // intmax_t is the largest type that your compiler and lib can deal with                
+        
         static_assert(sizeof(intmax_t) >= sizeof(uint64_t));
+        
         intmax_t maxt = 0xdeadbeefbaadf00d;
         printf("num64 as MaxSizeType == %jd\n", maxt);
 
@@ -168,10 +184,11 @@ int main(int argc, char ** argv)
 
         uint64_t num64;
         num64 = 1LLU<<63;
-        printf("2^63 == %lu\n", num64);
-
+        printf("2^63 == %llu\n", num64);
+        cout << "2^63 == " << num64 << endl;
+        
         num64 = 0xdeadbeefbaadf00d;
-        printf("0xdeadbeefbaadf00d == %lx\n", num64);
+        printf("0xdeadbeefbaadf00d == %llx\n", num64);
         printf("0xdeadbeefbaadf00d as signed decimal == %" PRId64 "\n", num64);
         printf("0xdeadbeefbaadf00d as unsigned decimal == %" PRIu64 "\n", num64);
         cout << "num64 streamed to cout == " << num64 << endl;
@@ -188,6 +205,52 @@ int main(int argc, char ** argv)
         // add -lfmt to compiler command line
 
         using namespace fmt::v8;
-        cout << format("Hello");
+        cout << format("Hello") << endl;
+
+        // Printing arguments out of order:
+        
+        // Should print: "a, b, c"
+        cout << format("{}, {}, {}", 'a', 'b', 'c') << endl;
+        
+        // Should print: "c, b, a"
+        cout << format("{2}, {1}, {0}", 'a', 'b', 'c') << endl;
+
+        // Dyamic and static Width
+        cout << format("{:<{}}", "left aligned", 30)  << endl;          // Width as argument
+        cout << format("{:>30}", "right aligned") << endl;              // Width in format 
+        
+        // Dyanmic and static precision
+        
+        cout << format("{:.{}f}", 3.14159265, 3) << endl;
+        cout << format("{:.3f}", 3.14159265) << endl;
+
+        // Handling the sign
+        
+        // Expect: "+3.140000; -3.140000"
+        cout << format("{:+f}; {:+f}", 3.14, -3.14) << endl;  // show it always
+
+        // Expect: " 3.140000; -3.140000"
+        cout << format("{: f}; {: f}", 3.14, -3.14) << endl;  // show a space for positive numbers
+
+        // Expect: "3.140000; -3.140000"
+        cout << format("{:-f}; {:-f}", 3.14, -3.14) << endl;  // show only the minus -- same as '{:f}; {:f}'
+        
+        // Converting to different number bases
+
+        // Expect: "int: 42;  hex: 2a;  oct: 52; bin: 101010"
+        // with 0x or 0 or 0b as prefix:
+                
+        cout << format("int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42) << endl;
+
+        // Expect: "int: 42;  hex: 0x2a;  oct: 052;  bin: 0b101010"fmt::format("int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42);
+        // Expect: "int: 42;  hex: 2a;  oct: 52; bin: 101010"
+        // with 0x or 0 or 0b as prefix:
+
+        cout << format("int: {0:d};  hex: {0:#x};  oct: {0:#o};  bin: {0:#b}", 42) << endl;
+
+        // Expect: "int: 42;  hex: 0x2a;  oct: 052;  bin: 0b101010"
+
+        cout << format("int: {0:d};  hex: {0:#x};  oct: {0:#o};  bin: {0:#b}", 42) << endl;
+        
         return 0;
 }
