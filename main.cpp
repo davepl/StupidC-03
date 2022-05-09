@@ -1,5 +1,9 @@
 #include "header.h"
 
+using namespace std;
+using namespace std::chrono;
+using namespace fmt::v8;
+
 int main(int argc, char ** argv)
 {
         // What we can say about type sizes in C:
@@ -16,7 +20,7 @@ int main(int argc, char ** argv)
         int x = 3;
         printf("x = %d\n", x);
 
-        // Sometimes we don't know the actual size, becasue of the "at least" stuff
+        // Sometimes we don't know the actual size, because of the "at least" stuff
         // intmax_t is the largest type that your compiler and lib can deal with
 
         intmax_t maxt = 0xdeadbeef;
@@ -24,10 +28,11 @@ int main(int argc, char ** argv)
 
         // Printing 64 bit quantities properly
 
-        static_assert(sizeof(intmax_t) >= sizeof(uint64_t));
+        static_assert(sizeof(intmax_t) >= sizeof(uint64_t), "Expecting at least 64 bits");
 
         uint64_t num64;
         num64 = 1LLU<<63;
+
         printf("2^63 == %lu\n", num64);
 
         num64 = 0xdeadbeefbaadf00d;
@@ -35,24 +40,43 @@ int main(int argc, char ** argv)
         printf("0xdeadbeefbaadf00d as signed decimal == %" PRId64 "\n", num64);
         printf("0xdeadbeefbaadf00d as unsigned decimal == %" PRIu64 "\n", num64);
 
-        using namespace std;      
         cout << "num64 streamed to cout == " << num64 << endl;
         
         // __uint128_t num128 = 0;
         // cout << "num128 streamed out == " << num128 << endl;
         
         //
+        // Basic time/date stuff in C++
+        //
+        
+        using day_t = duration<long, std::ratio<3600 * 24>>;
+        auto start  = system_clock::now();
+        std::this_thread::sleep_for(seconds(1));
+        auto end = system_clock::now();
+        auto dur = end - start;
+        auto d = duration_cast<day_t>(dur);
+        auto h = duration_cast<hours>(dur -= d);
+        auto m = duration_cast<minutes>(dur -= h);
+        auto s = duration_cast<seconds>(dur -= m);
+        auto ms = duration_cast<seconds>(dur -= s);
+        std::cout << d.count() << " days, "
+                << h.count() << " hours, "
+                << m.count() << " minutes, "
+                << s.count() << " seconds, "
+                << ms.count() << " milliseconds\n";
+
+        //
         // Durations in C++
         //
-
-        using namespace std::chrono;
         
         time_t result = time(nullptr);
         cout << ctime(&result);
         
         auto t1 = high_resolution_clock::now();
-        sleep(1);
+        this_thread::sleep_for(seconds(1));
         auto t2 = high_resolution_clock::now();
+
+        //cout << format("%D", t2) << endl;
 
         // floating-point duration: no duration_cast needed
 
@@ -84,7 +108,6 @@ int main(int argc, char ** argv)
                   << "or " << count_mssec << " milliseconds" << endl
                   << "or " << count_usec  << " microseconds" << endl 
                   << "or " << count_nsec  << " nanoseconds" << endl;               
-
         //
         // Clocks
         //
@@ -93,16 +116,40 @@ int main(int argc, char ** argv)
         auto monotonicNow   = steady_clock::now();
         auto highResNow     = high_resolution_clock::now();
         
-        hh_mm_ss = 
+        // Get the the number of milliseconds elapsed since the epoch until now
+        
+        auto msclockOnTheWall = time_point_cast<milliseconds>(system_clock::now());        
+        auto millis_since_utc_epoch = msclockOnTheWall.time_since_epoch();
+        
         // Integer limits
         
-        int min_int = INT_MIN;
-        int max_int = INT_MAX;
-
-        min_int = numeric_limits<int>::min();
-        max_int = numeric_limits<int>::max();
+        size_t min_int = numeric_limits<int>::min();           // New way
+        size_t max_int = numeric_limits<int>::max();
         cout << "Min: " << min_int << ", Max: " << max_int << endl;
-
+                
+        // Year, Month, Day types
+        
+        constexpr year  thisYear(2022);
+        constexpr month thisMonth(May);
+        constexpr day   thisDay(8);
+        
+        //cout << "Year: " << thisYear << " , Month: " << thisMonth << ", Day: " << thisDay << " isLeap: " << std::noboolalpha << thisYear.is_leap() << endl;
+        
+        static_assert(thisYear == 2022y);
+        
+        year_month thisYearMonth(thisYear, thisMonth);        
+        year_month_day today(thisYear, thisMonth, thisDay);
+        
+        constexpr year_month_day_last lastDayOfThisMonthV1 =  2022y / May / last;
+        constexpr year_month_day_last lastDayOfThisMonthV2 =  last / May / 2022y;        
+        constexpr year_month_day_last lastDayOfThisMonthV3 =  May / last / 2022y;
+        
+        static_assert(lastDayOfThisMonthV1 == lastDayOfThisMonthV2 and lastDayOfThisMonthV2 == lastDayOfThisMonthV3);
+        
+        const year_month_day ymd { floor<days>(system_clock::now()) };
+        
+         
+        
         // Formatting
         //
         // cmake CMakeLists.txt
@@ -110,8 +157,6 @@ int main(int argc, char ** argv)
         // sudo make install
         // use clang++
         // add -lfmt to compiler command line
-
-        using namespace fmt::v8;
 
         cout << format("Hello");
 
