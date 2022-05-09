@@ -1,52 +1,48 @@
 #include "header.h"
 
+using namespace std::chrono;
+using namespace std; 
+
 int main(int argc, char ** argv)
 {
-        // What we can say about type sizes in C:
+
+        
+        // 
+        // Classic Date and Time
         //
-        // char, signed char, and unsigned char are at least 8 bits
-        // signed short, unsigned short, signed int, and unsigned int are at least 16 bits
-        // signed long and unsigned long are at least 32 bits
-        // signed long long and unsigned long long are at least 64 bits        
 
-        printf("Hello World\n");
+        // Program duration (estimate of how long program has been running)
 
-        // When we know the variable type size
+        clock_t clocks = clock();
+        cout << "Program has been running for " << clocks << " clocks." << endl;
+        cout << "Which is equivalent to " <<  (double) clocks / CLOCKS_PER_SEC << " seconds with " 
+             <<  CLOCKS_PER_SEC << " clocks per second." << endl;
 
-        int x = 3;
-        printf("x = %d\n", x);
+        // Current date and time
 
-        // Sometimes we don't know the actual size, becasue of the "at least" stuff
-        // intmax_t is the largest type that your compiler and lib can deal with
-
-        intmax_t maxt = 0xdeadbeef;
-        printf("num64 as MaxSizeType == %jd\n", maxt);
-
-        // Printing 64 bit quantities properly
-
-        static_assert(sizeof(intmax_t) >= sizeof(uint64_t));
-
-        uint64_t num64;
-        num64 = 1LLU<<63;
-        printf("2^63 == %lu\n", num64);
-
-        num64 = 0xdeadbeefbaadf00d;
-        printf("0xdeadbeefbaadf00d == %lx\n", num64);
-        printf("0xdeadbeefbaadf00d as signed decimal == %" PRId64 "\n", num64);
-        printf("0xdeadbeefbaadf00d as unsigned decimal == %" PRIu64 "\n", num64);
-
-        using namespace std;      
-        cout << "num64 streamed to cout == " << num64 << endl;
+        time_t ttime = time(0);
+        char * dt = ctime(&ttime);
+        cout << "The current local date and time is: " << dt;
         
-        // __uint128_t num128 = 0;
-        // cout << "num128 streamed out == " << num128 << endl;
-        
+        tm * gmt_time = gmtime(&ttime);
+        dt = asctime(gmt_time);
+        cout << "The current UTC date and time is:" << dt;
+
+        // Localtime and parsing it out
+
+        tm *local_time = localtime(&ttime);
+    
+        cout << "Year: "  << 1900 + local_time->tm_year << endl;        // Year is 1900-based
+        cout << "Month: " << 1 + local_time->tm_mon<< endl;             // Month is 0-based
+        cout << "Day: "   << local_time->tm_mday << endl;               // Day is 1-based
+        cout << "Time: "  << local_time->tm_hour << ":";            // Hour is zero based
+                     cout << local_time->tm_min << ":";                    
+                     cout << local_time->tm_sec << endl;
+
         //
         // Durations in C++
         //
-
-        using namespace std::chrono;
-        
+       
         time_t result = time(nullptr);
         cout << ctime(&result);
         
@@ -93,15 +89,51 @@ int main(int argc, char ** argv)
         auto monotonicNow   = steady_clock::now();
         auto highResNow     = high_resolution_clock::now();
         
-        hh_mm_ss = 
+        //
         // Integer limits
-        
-        int min_int = INT_MIN;
-        int max_int = INT_MAX;
+        //        
 
-        min_int = numeric_limits<int>::min();
-        max_int = numeric_limits<int>::max();
-        cout << "Min: " << min_int << ", Max: " << max_int << endl;
+        size_t min_int = numeric_limits<int>::min();
+        size_t max_int = numeric_limits<int>::max();
+        cout << "Int Min: " << min_int << ", Max: " << max_int << endl;
+
+        double min_double = numeric_limits<double>::min();
+        double max_double = numeric_limits<double>::min();
+
+        cout << "Double Min: " << min_double << ", Max: " << max_double << endl;
+
+        double min_byte = numeric_limits<uint8_t>::min();
+        double max_byte = numeric_limits<uint8_t>::max();
+
+        cout << "Byte Min: " << min_byte << ", Max: " << max_byte << endl;
+
+        // What we can say about type sizes in C:
+        //
+        // char, signed char, and unsigned char are at least 8 bits
+        // signed short, unsigned short, signed int, and unsigned int are at least 16 bits
+        // signed long and unsigned long are at least 32 bits
+        // signed long long and unsigned long long are at least 64 bits        
+        // Sometimes we don't know the actual size, because of the "at least" stuff
+        // intmax_t is the largest type that your compiler and lib can deal with
+
+        static_assert(sizeof(intmax_t) >= sizeof(uint64_t));
+        intmax_t maxt = 0xdeadbeefbaadf00d;
+        printf("num64 as MaxSizeType == %jd\n", maxt);
+
+        // Printing 64 bit quantities properly
+
+        uint64_t num64;
+        num64 = 1LLU<<63;
+        printf("2^63 == %lu\n", num64);
+
+        num64 = 0xdeadbeefbaadf00d;
+        printf("0xdeadbeefbaadf00d == %lx\n", num64);
+        printf("0xdeadbeefbaadf00d as signed decimal == %" PRId64 "\n", num64);
+        printf("0xdeadbeefbaadf00d as unsigned decimal == %" PRIu64 "\n", num64);
+        cout << "num64 streamed to cout == " << num64 << endl;
+        
+        // __uint128_t num128 = 0;
+        // cout << "num128 streamed out == " << num128 << endl;
 
         // Formatting
         //
@@ -112,8 +144,6 @@ int main(int argc, char ** argv)
         // add -lfmt to compiler command line
 
         using namespace fmt::v8;
-
         cout << format("Hello");
-
         return 0;
 }
