@@ -5,8 +5,6 @@ using namespace std;
 using namespace std::chrono;
 using namespace fmt::v8;
 
-#include <arm/types.h>
-
 int main(int argc, char** argv)
 {
     constexpr auto SECONDS_PER_DAY = 60 * 60 * 24;

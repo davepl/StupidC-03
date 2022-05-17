@@ -21,7 +21,7 @@
                 "$gcc"
             ],
             "group": "build",
-            "detail": "compiler: /usr/bin/g++"
+            "detail": "compiler: /usr/bin/clang++"
         },
         {
             "label": "Run Program",
