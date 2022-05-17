@@ -8,7 +8,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "-std=c++2a",
+                "-std=gnu++2a",
                 "${file}",
                 "-lfmt",
                 "-o",
