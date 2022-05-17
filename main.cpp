@@ -3,36 +3,53 @@ using namespace std::chrono;
 
 using namespace std;
 using namespace std::chrono;
+using namespace fmt::v8;
+
+#include <arm/types.h>
 
 int main(int argc, char** argv)
 {
+    constexpr auto SECONDS_PER_DAY = 60 * 60 * 24;
+
     // 
-    // Classic Date and Time
+    // Classic Date and Time examples
     //
 
     clock_t clocks = clock();
     cout << "Program has been running for " << clocks << " clocks." << endl;
-    cout << "That is equivalent to " << (double)clocks / CLOCKS_PER_SEC << " seconds with "
-        << CLOCKS_PER_SEC << " clocks per second." << endl;
+    cout << "That is equivalent to " <<  (double) clocks / CLOCKS_PER_SEC << " seconds with " 
+            <<  CLOCKS_PER_SEC << " clocks per second." << endl;
 
     // Current date and time
 
-    time_t ttime = time(0);
-    char* dt = ctime(&ttime);
+    time_t now = time(nullptr);
+    char * dt = ctime(&now);
     cout << "The current local date and time is: " << dt;
-
-    tm* gmt_time = gmtime(&ttime);
-    dt = asctime(gmt_time);
+    
+    tm gmt_time = *gmtime(&now);
+    dt = asctime(&gmt_time);
     cout << "The current UTC date and time is:" << dt;
+
+    // Create a date and time for Christmas this year
+    
+    auto Christmas = *localtime(&now);
+    Christmas.tm_hour = 0; 
+    Christmas.tm_min = 0; 
+    Christmas.tm_sec = 0;
+    Christmas.tm_mon = 12;  
+    Christmas.tm_mday = 25;
+
+    auto sec = difftime(mktime(&Christmas), now);
+    cout << "It is " << (int)(sec / (SECONDS_PER_DAY)) << " days until Christmas this calendar year." << endl;    
 
     // Localtime and parsing it out
 
-    tm* local_time = localtime(&ttime);
+    tm* local_time = localtime(&now);
 
-    cout << "Year: " << 1900 + local_time->tm_year << endl;        // Year is 1900-based
-    cout << "Month: " << 1 + local_time->tm_mon << endl;             // Month is 0-based
-    cout << "Day: " << local_time->tm_mday << endl;               // Day is 1-based
-    cout << "Time: " << local_time->tm_hour << ":";            // Hour is zero based
+    cout << "Year: "  << 1900 + local_time->tm_year << endl;        // Year is 1900-based
+    cout << "Month: " << 1 + local_time->tm_mon     << endl;        // Month is 0-based
+    cout << "Day: "   << local_time->tm_mday        << endl;        // Day is 1-based
+    cout << "Time: "  << local_time->tm_hour        << ":";         // Hour is zero based
     cout << local_time->tm_min << ":";
     cout << local_time->tm_sec << endl;
 
